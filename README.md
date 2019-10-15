@@ -3,5 +3,7 @@
 ## Installing
 In R
 
-    require('devtools')
-    install_github('tabenius/fusedepoc')
+```R
+require('devtools')
+install_github('tabenius/fusedepoc')
+```
