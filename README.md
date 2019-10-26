@@ -1,13 +1,4 @@
----
-title: "Fused EPoC Guide"
-author: "Tobias Abenius"
-date: "October 26, 2019"
-output: 
-  html_document: 
-    keep_md: yes
----
-
-
+# Fused EPoC Guide
 
 This is a guide to how to perform a Fused EPoC analysis.
 First installation of software will be covered and then how to perform an analysis with an included dataset.
