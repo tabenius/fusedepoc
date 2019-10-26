@@ -149,5 +149,8 @@ savejson <- function(json, filename=NULL, format="jsmodule") {
     } else {
       stop("unknown format \"",format,"\". Supported formats are \"json\", \"jsmodule\" and \"js\".")
     }
-  } 
+    close(fc)
+  }  else {
+    stop("filename required")
+  }
 }

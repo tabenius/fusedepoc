@@ -102,7 +102,7 @@ getGraph <- function(i, j, A, labs=NULL, threshIsLink=1e-2, threshIsSame=1e-3) {
     thick <- c(thick, ew)
     gw <- addEdge(labsc[ii], labsc[jj], gw, ew) #A[ii,jj,1])
 
-    et <- ifelse(mean((A[ii,jj,])) > 0, "", "tee")
+    et <- ifelse(mean((A[ii,jj,])) > 0, "normal", "tee")
     edgetype <- c(edgetype, arrowType=et, recursive=T)
   } else {
       #print(edgename)
@@ -124,16 +124,8 @@ getGraph <- function(i, j, A, labs=NULL, threshIsLink=1e-2, threshIsSame=1e-3) {
   lwd <- 1 + 2*thick
   names(lwd) <- en
   l <- list(graph=gw,edgeAttrs=list(color=edgecolor, arrowhead=edgetype, lwd=lwd),nodeAttrs=list(width=width,shape=shape),mask=mask, en=en)
-  #list(graph=gw,edgeAttrs=list(color=edgecolor,lwd=lw2,splines=splines),nodeAttrs=list(width=width,shape=shape),mask=mask)
-	#l$ng <- agopen(graph=l$graph,edgeAttrs=l$edgeAttrs,nodeAttrs=l$nodeAttrs,name="gene regulatory network")
 	l$ng <- layoutGraph(l$graph, edgeAttrs=l$edgeAttrs,nodeAttrs=l$nodeAttrs,name="gene regulatory network")
-#	for (i in (1:length(en))) {
-#    print(c(en[i], thick[i]))
-#    ID <- strsplit(en[i],"~")
-#		l$ng <- setEdgeAttr(l$ng, "lwd", 1+log(thick[i]), ID[[1]][1], ID[[1]][2])
-##		l$ng <- setEdgeAttr(l$ng, "arrowhead", edgetype[i], ID[[1]][1], ID[[1]][2])
-#  }
-  return(l)
+  return(l$ng)
 }
 getEdgeAttr <- function(graph, attribute, ID1, ID2) {
   idfunc <- function(x) paste0( sort(x), collapse="~" )
