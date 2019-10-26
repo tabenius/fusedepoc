@@ -41,7 +41,6 @@ result2json2 <- function(netnames,lambda1s,lambda2s,species,FF) {
 #'   c('type A','type B'))
 #'
 fusedepocToJSON <- function(result, species, netnames) {
-  #require('jsonlite')
   l <- result2json3(netnames, result$lambda1, result$lambda2, species, result$coefficients)
   invisible(toJSON(l))
 }
@@ -131,6 +130,12 @@ graph2json <- function (g,filename=NULL,format="jsmodule") {
   } 
   return(invisible(txt))
 }
+#' Save a JSON string as a file
+#'
+#' @param json JSON string
+#' @param filename filename
+#' @param format jsmodule, json or js
+#' @export
 savejson <- function(json, filename=NULL, format="jsmodule") {
   txt <- json
   if (length(filename) > 0) {

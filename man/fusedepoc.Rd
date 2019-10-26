@@ -4,7 +4,8 @@
 \alias{fusedepoc}
 \title{Fused EPoC}
 \usage{
-fusedepoc(Y, U, lambda1, lambda2, method = "G", trace = 1, optim = TRUE)
+fusedepoc(Y, U, lambda1, lambda2, method = "G", trace = 1,
+  optim = TRUE, stabilise = FALSE)
 }
 \arguments{
 \item{Y}{list of K mRNA expression level matrices
@@ -25,9 +26,12 @@ coefficients in the K different classes}
 In short, 'G' uses CNA as predictors while 'A' uses mRNA as
 predictors.}
 
-\item{trace}{The verbosity of information while running}
+\item{trace}{The verbosity of information while running. 0
+is quiet. Default 1.}
 
 \item{optim}{Whether to use the optimized version or not}
+
+\item{stabilise}{Whether to use the 10-times stabilization}
 }
 \description{
 From several (K) data sets with data-levels mRNA and CNA

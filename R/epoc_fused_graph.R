@@ -15,7 +15,7 @@
 #' @importFrom methods new
 #' @export
 getGraph <- function(i, j, A, labs=NULL, threshIsLink=1e-2, threshIsSame=1e-3) {
-  if (class(A) == 'FusedEPOC')
+  if (class(A) == 'FusedEPOC' || class(A) == 'FusedEPOCstabilized')
     A <- A$coefficients
 
   if (i > dim(A)[4]) stop("i outside range")
@@ -46,6 +46,7 @@ getGraph <- function(i, j, A, labs=NULL, threshIsLink=1e-2, threshIsSame=1e-3) {
   nodes <- labsc[1:p][mask]
   gw <- new("graphNEL", nodes=nodes,edgemode="directed")
   splines <- NULL
+  edgetype <- NULL
   edgecolor <- NULL
   thick <- NULL
   pwfact <- 1
@@ -91,6 +92,7 @@ getGraph <- function(i, j, A, labs=NULL, threshIsLink=1e-2, threshIsSame=1e-3) {
 	    edgecolor <- c(edgecolor,color="cyan",recursive=T)
       ew <- mean(abs(A[ii,jj,c(2,3)]))
 	  } else {
+      cat("problem with this edge (could be that more than 3 cancer types are unsupported:")
       print(edgename)
     }
 	}
@@ -99,6 +101,9 @@ getGraph <- function(i, j, A, labs=NULL, threshIsLink=1e-2, threshIsSame=1e-3) {
     ew <- ew * pwfact
     thick <- c(thick, ew)
     gw <- addEdge(labsc[ii], labsc[jj], gw, ew) #A[ii,jj,1])
+
+    et <- ifelse(mean((A[ii,jj,])) > 0, "", "tee")
+    edgetype <- c(edgetype, arrowType=et, recursive=T)
   } else {
       #print(edgename)
   }
@@ -115,18 +120,19 @@ getGraph <- function(i, j, A, labs=NULL, threshIsLink=1e-2, threshIsSame=1e-3) {
   names(lw2) <- en
   names(splines) <- en
   names(edgecolor) <- en
-  l <- list(graph=gw,edgeAttrs=list(color=edgecolor),nodeAttrs=list(width=width,shape=shape),mask=mask, en=en)
+  names(edgetype) <- en
+  lwd <- 1 + 2*thick
+  names(lwd) <- en
+  l <- list(graph=gw,edgeAttrs=list(color=edgecolor, arrowhead=edgetype, lwd=lwd),nodeAttrs=list(width=width,shape=shape),mask=mask, en=en)
   #list(graph=gw,edgeAttrs=list(color=edgecolor,lwd=lw2,splines=splines),nodeAttrs=list(width=width,shape=shape),mask=mask)
-	l$ng <- agopen(graph=l$graph,edgeAttrs=l$edgeAttrs,nodeAttrs=l$nodeAttrs,name="gene regulatory network")
-	for (i in (1:length(en))) {
+	#l$ng <- agopen(graph=l$graph,edgeAttrs=l$edgeAttrs,nodeAttrs=l$nodeAttrs,name="gene regulatory network")
+	l$ng <- layoutGraph(l$graph, edgeAttrs=l$edgeAttrs,nodeAttrs=l$nodeAttrs,name="gene regulatory network")
+#	for (i in (1:length(en))) {
 #    print(c(en[i], thick[i]))
-    ID <- strsplit(en[i],"~")
-    if (ID[[1]][1] == "CLU" || ID[[1]][2] == "CLU")  {
-      print(ID[[1]])
-      print(thick[1])
-    }
-		l$ng <- setEdgeAttr(l$ng, "lwd", 1+log(thick[i]), ID[[1]][1], ID[[1]][2])
-  }
+#    ID <- strsplit(en[i],"~")
+#		l$ng <- setEdgeAttr(l$ng, "lwd", 1+log(thick[i]), ID[[1]][1], ID[[1]][2])
+##		l$ng <- setEdgeAttr(l$ng, "arrowhead", edgetype[i], ID[[1]][1], ID[[1]][2])
+#  }
   return(l)
 }
 getEdgeAttr <- function(graph, attribute, ID1, ID2) {

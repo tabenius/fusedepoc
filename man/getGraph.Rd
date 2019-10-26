@@ -4,7 +4,8 @@
 \alias{getGraph}
 \title{Get colored multi-graph from Fused EPoC results}
 \usage{
-getGraph(i, j, A, labs = NULL, threshIsLink = 0.01, threshIsSame = 0.001)
+getGraph(i, j, A, labs = NULL, threshIsLink = 0.01,
+  threshIsSame = 0.001)
 }
 \arguments{
 \item{i}{lambda1 index (LASSO penalty)}

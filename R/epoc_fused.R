@@ -1,5 +1,42 @@
-#source('R/fused.R')
-
+fusedepoc.stabilised <- function(mRNA,CNA,lambda1s,lambda2s,method,trace,optim) {
+  p <- dim(mRNA[[1]])[2]
+  K <- length(mRNA)
+  I <- length(lambda1s)
+  J <- length(lambda2s)
+  STAB <- 10
+	FF <- array(NA,dim=c(p,p,K,I,J,STAB))
+  for(STABi in 1:STAB) {
+    mRNA.stab <- list()
+    CNA.stab <- list()
+    for (k in 1:K) {
+      Y<-mRNA[[k]]
+      U<-CNA[[k]]
+      N <- dim(Y)[1]
+      m <- floor(N * (STABi-1)/STAB)+1
+      M <- floor(N * (STABi)/STAB)
+      if(trace >= 1) {
+        cat("\r")
+        cat(STABi)
+        cat("/")
+        cat(10)
+      }
+      Y <- Y[-(m:M),]
+      U <- U[-(m:M),]
+      mRNA.stab[[k]] <- Y
+      CNA.stab[[k]] <- U
+    }
+    GF <- fusedepoc(Y=mRNA.stab, U=CNA.stab, lambda1=lambda1s, lambda2=lambda2s, trace=trace, optim=optim, method=method)
+    GF$coefficients[,,,,][abs(GF$coefficients[,,,,]) < 1e-2] <- 0
+    FF[,,,,,STABi] <- GF$coefficients
+  }
+  thresh <- 1e-2
+  FF.mean <- apply(FF,MARGIN=1:5,FUN=mean)
+  FF.mask <- apply(FF,MARGIN=1:5,FUN=function(xs) { any(abs(xs) < thresh)})
+  FF.mean[FF.mask] <- 0
+  ret <- list(coefficients=FF.mean, lambda1=lambda1s, lambda2=lambda2s)
+  class(ret) <- "FusedEPOCstabilized"
+  return(ret)
+}
 #' Fused EPoC 
 #'
 #' From several (K) data sets with data-levels mRNA and CNA
@@ -17,8 +54,10 @@
 #' @param method 'G' or 'A' as defined for the EPoC method.
 #' In short, 'G' uses CNA as predictors while 'A' uses mRNA as
 #' predictors.
-#' @param trace The verbosity of information while running
+#' @param trace The verbosity of information while running. 0
+#' is quiet. Default 1.
 #' @param optim Whether to use the optimized version or not
+#' @param stabilise Whether to use the 10-times stabilization
 #' @import epoc
 #' @import lassoshooting
 #' @examples
@@ -31,20 +70,24 @@
 #' @export
 #' @useDynLib fusedepoc
  
-fusedepoc <- function(Y,U,lambda1,lambda2,method='G',trace=1,optim=TRUE) {
-#  if (!require(epoc)) stop("require package epoc")
+fusedepoc <- function(Y,U,lambda1,lambda2,method='G',trace=1,optim=TRUE, stabilise=FALSE) {
   cl <- match.call()
-  epsilon <- 1e-6
   if (typeof(Y)!="list") stop("not a list")
   if (typeof(U)!="list") stop("not a list")
+  if (length(U)!=length(Y)) stop("mRNA and CNA must have same length")
+
+  if (stabilise) {
+    return(fusedepoc.stabilised(Y,U,lambda1,lambda2,method,trace,optim))
+  }
+  epsilon <- 1e-6
   K <- length(Y)
-  cat(paste("K",K,sep=": "),"\n")
+  if (trace >= 2) cat(paste("K",K,sep=": "),"\n")
   psame <- length(unique(sapply(Y,function(x) dim(x)[2]))) == 1
   if (psame != TRUE) stop("not same p")
   p <- dim(Y[[1]])[2]
-  cat(paste("p",p,sep=": "),"\n")
+  if (trace >= 2) cat(paste("p",p,sep=": "),"\n")
   Ns <- sapply(Y,function(x) dim(x)[1])
-  print(Ns)
+  if (trace >= 2) print(Ns)
   hasU <- !is.null(U)
   YonU <- list()
   Yres <- list()
@@ -84,7 +127,7 @@ fusedepoc <- function(Y,U,lambda1,lambda2,method='G',trace=1,optim=TRUE) {
     pred <- Y
     resp <- Yres
   }
-  cat('Finding lambdamax\n')
+  if (trace > 0) cat('Finding lambdamax\n')
   lambdamax <- array(0,dim=K)
   for (k in 1:K) {
     inorms <- epoc.lambdamax(pred[[k]],resp[[k]],getall=T)
@@ -95,7 +138,7 @@ fusedepoc <- function(Y,U,lambda1,lambda2,method='G',trace=1,optim=TRUE) {
   }
 #  lambda1 <- max(lambdamax) * lambda1
 
-  cat('Creating penalty matrix\n')
+  if (trace > 0) cat('Creating penalty matrix\n')
   pen <- penmatrix(p,K)
   L <- pen$L
   m <- pen$m
@@ -123,9 +166,9 @@ fusedepoc <- function(Y,U,lambda1,lambda2,method='G',trace=1,optim=TRUE) {
   if (optim == TRUE) {
     xtx <- crossprod(X)
   }
-  cat('Running solver for row \n')
+  if (trace > 0) cat('Running solver for row \n')
   for (i in 1:p) {
-    cat(paste(i,'\n',sep=''))
+    if (trace > 0) cat(paste(i,'\n',sep=''))
     X1 <- X
     X1[,i] <- 0
     y <- unlist(sapply(1:K, function(k) resp[[k]][,i]))
@@ -175,7 +218,7 @@ fusedepoc <- function(Y,U,lambda1,lambda2,method='G',trace=1,optim=TRUE) {
     B[i,i,,,] <- d[i,]
     B[,i,,,][abs(B[,i,,,]) < epsilon] <- 0
   }
-  cat("Returning\n")
+  if (trace > 0) cat("Returning\n")
   ret <- list(call=cl,coefficients=B,lambdamax=lambdamax,d=d,Y.mean=muY,U.mean=muU,Yres.mean=muYres, lambda1=lambda1, lambda2=lambda2)
   class(ret) <- "FusedEPOC"
   return(ret)
@@ -194,3 +237,4 @@ netsize <- function(A, thresh=1e-2) {
   di <- seq(1,p*p,by=p+1)
   sum(abs(A[-di]) > thresh)
 }
+
