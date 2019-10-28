@@ -4,14 +4,15 @@
 \alias{savejson}
 \title{Save a JSON string as a file}
 \usage{
-savejson(json, filename = NULL, format = "jsmodule")
+savejson(json, filename = NULL, format = "js")
 }
 \arguments{
 \item{json}{JSON string}
 
 \item{filename}{filename}
 
-\item{format}{jsmodule, json or js}
+\item{format}{jsmodule, json or js (default js in a
+variable named netdata suitable for the GUI)}
 }
 \description{
 Save a JSON string as a file

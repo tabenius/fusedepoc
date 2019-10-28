@@ -134,7 +134,8 @@ graph2json <- function (g,filename=NULL,format="jsmodule") {
 #'
 #' @param json JSON string
 #' @param filename filename
-#' @param format jsmodule, json or js
+#' @param format jsmodule, json or js (default js in a
+#' variable named netdata suitable for the GUI)
 #' @export
 savejson <- function(json, filename=NULL, format="js") {
   txt <- json
