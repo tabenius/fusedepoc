@@ -24,5 +24,6 @@ coefficients to be fused}
 }
 \description{
 Given parameter indices for lambda1 and lambda2, get a
-multi-graph from a result set of Fused EPoC
+multi-graph from a result set of Fused EPoC that can be
+rendered using Rgraphviz `rendergraph`
 }

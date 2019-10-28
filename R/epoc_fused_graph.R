@@ -1,7 +1,8 @@
 #' Get colored multi-graph from Fused EPoC results
 #'
 #' Given parameter indices for lambda1 and lambda2, get a
-#' multi-graph from a result set of Fused EPoC
+#' multi-graph from a result set of Fused EPoC that can be
+#' rendered using Rgraphviz `rendergraph`
 #' @param i lambda1 index (LASSO penalty)
 #' @param j lambda2 index (Fused penalty)
 #' @param A Fused EPoC result set or a coefficient array
