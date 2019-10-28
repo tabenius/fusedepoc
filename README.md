@@ -118,7 +118,6 @@ All links are printed with their respective magnitudes. To plot this graph using
 
 ```r
 require(Rgraphviz)
-#gr <- layoutGraph(gr4$graph, edgeAttrs=gr4$edgeAttrs, nodeAttrs=gr4$nodeAttrs, name="Gene regulatory network")
 renderGraph(gr4)
 ```
 
@@ -163,7 +162,6 @@ gr.stab <- getGraph(1,4,result,realistic$species)
 ```
 
 ```r
-#gr <- layoutGraph(gr.stab$graph, edgeAttrs=gr.stab$edgeAttrs, nodeAttrs=gr.stab$nodeAttrs, name="Gene regulatory network")
 renderGraph(gr.stab)
 ```
 
