@@ -136,12 +136,12 @@ graph2json <- function (g,filename=NULL,format="jsmodule") {
 #' @param filename filename
 #' @param format jsmodule, json or js
 #' @export
-savejson <- function(json, filename=NULL, format="jsmodule") {
+savejson <- function(json, filename=NULL, format="js") {
   txt <- json
   if (length(filename) > 0) {
     fc <- file(filename)
     if (format == "js") {
-      writeLines(paste("var cytoscapedata = ",txt,";", sep=""), con=fc)
+      writeLines(paste("var netdata = ",txt,";", sep=""), con=fc)
     } else if (format == "jsmodule") {
       writeLines(paste("module.exports = ",txt,";", sep=""), con=fc)
     } else if (format == "json") {
