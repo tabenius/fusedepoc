@@ -18,7 +18,7 @@ unzip ~/Downloads/fusedepoc-master.zip
 R CMD INSTALL fusedepoc-master
 ```
 
-The graphical user interface depend on a working `node` and `npm` installation. It lets you work with solution sets graphically. It can be installed by first, downloading <https://github.com/tabenius/fusedepoc-gui/archive/master.zip>, second, unpacking it and third, run the `setup.sh` script to install the required dependencies. When a solution set is prepared it will be bundled with the GUI instance. These steps will be covered below.
+The graphical user interface depend on a working `node` and `npm` installation. It lets you work with solution sets graphically. It can be installed by first, downloading <https://github.com/tabenius/fusedepoc-gui/archive/master.zip>, second, unpacking it and third, run the `setup.sh` script to install the required dependencies. When a solution set is prepared it will be bundled with the GUI instance. The GUI can also be used online. These steps will be covered below.
 
 # The `fusedepoc` package
 
