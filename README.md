@@ -217,18 +217,11 @@ Available on:
 Make sure to use <http://localhost:8080> (port might change) instead of `127.0.0.1` as security restrictions (CORS) for the gene information features don't work with ip adresses.
 
 ## Using the GUI online
-To use the GUI online the result json needs to be stored somewhere. We do not provide such capabilities but either you publish the `result.js` somewhere on a server of your own or you use an online service. There are many online services that lets you store your json online for free. Below it is shown how to use the <http://jsonstorage.net> service directly from R.
+To use the GUI online the result json needs to be stored somewhere. We do not provide such capabilities but you can publish the `result.js` using an online service. There are many online services that lets you store your json online for free. Below it is shown how to use two services directly from R. First, for the <http://jsonstorage.net> service
 
 
 ```r
 require(httr)
-```
-
-```
-## Loading required package: httr
-```
-
-```r
 json <- fusedepocToJSON(result, realistic$species, realistic$description)
 URI <- "https://jsonstorage.net/api/items/"
 response <- POST(URI, body = json, encode="raw", content_type("application/json"))
@@ -253,6 +246,25 @@ content(response)
 ```
 ## $uri
 ## [1] "https://jsonstorage.net/api/items/f32e3ccf-a96d-44b5-86b8-ef923cc32e41"
+```
+
+If your result set is very large the service at <https://jsonblob.com> can probably take it. Change the above URI to
+```r
+URI <- "https://jsonblob.com/api/jsonBlob"
+```
+When uploaded, you will also need to use the R command below to see the location of the created JSON blob.
+```r
+headers(response)
+```
+```
+.
+.
+.
+## $location
+## [1] "https://jsonblob.com/api/jsonBlob/93bbcef5-fa4f-11e9-a508-6fbd7347a169"
+.
+.
+.
 ```
 
 When you have a result file in json somewhere online, go to
